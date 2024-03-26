@@ -1,0 +1,15 @@
+{
+    "name":"After School PWA",
+    "short_name":"afterschool",
+    "description":"my online after school lessons",
+    "icons":[
+        {
+            "src":"images/icon-512.png",
+            "sizes":"512x512",
+            "type":"image/png"
+        }
+    ],
+    "start_url":"afterSchool.html",
+    "display":"fullscreen",
+    "background_color":"#B12A34" 
+}
