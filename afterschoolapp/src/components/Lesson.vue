@@ -1,6 +1,6 @@
 <template>
-    <main>
-        <div id="productCard">
+    <div id="productContainer">
+        <div id="productCard" v-for="product in products" :key="product.id">
             <figure>
                 <img v-bind:src="product.image" />
             </figure>
@@ -19,14 +19,13 @@
                 left!</span>
             <span v-else>Buy Now!</span>
         </div>
-
-    </main>
+    </div>
 </template>
 
 <script>
 export default {
     name: "Lesson-Component",
-    props: ['product'],
+    props: ['products'],
     methods: {
         add(product) {
             console.log("Added product", product.id);
@@ -35,8 +34,8 @@ export default {
         canAddToCart(product) {
             return this.$emit('canAddToCart', product);
         },
-        cartCount(id){
-            return this.$emit('cartCount',id)
+        cartCount(id) {
+            return this.$emit('cartCount', id)
         }
     }
 }
