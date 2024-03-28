@@ -40,16 +40,16 @@
             <label for="descending">Descending</label>
           </div>
 
-          <div id="productContainer">
-            <lesson v-for="product in sortedProducts" :key="product.id" :product="product" 
-            @addProduct=addToCart @canAddtoCart=canAddToCart @cartCount="cartCount">
-            </lesson>
-          </div>
+
+          <lesson :products="products" @addProduct=addToCart @canAddtoCart=canAddToCart @cartCount=cartCount>
+          </lesson>
+
         </div>
       </div>
 
       <div v-else-if="cartItemCount > 0" id="cartCheckout">
-        <checkout :cart="cart" :products="products" @removeFromCart = removeFromCart></checkout>
+        <checkout :cart="cart" :products="products" @removeFromCart="removeFromCart" @submitForm="submitForm">
+        </checkout>
       </div>
 
       <div v-else style="text-align: center;">
@@ -79,11 +79,7 @@ export default {
       cart: [],
       searchInput: "",
       sortby: "",
-      orderby: "ascending",
-      order: {
-        name: "",
-        phone: ""
-      },
+      orderby: "ascending"
     }
   },
   created: function () {
@@ -113,6 +109,7 @@ export default {
           count++;
         }
       }
+      console.log(id + " - " + count);
       return count;
     },
     removeFromCart(product) {
@@ -122,18 +119,19 @@ export default {
       }
       product.availableInventory++;
     },
-    submitForm() {
-      this.order = {
-        name: this.order.name,
-        phone: this.order.phone,
-        cart: this.cart
-      }
+    submitForm(order) {
+      // this.order = {
+      //   name: this.order.name,
+      //   phone: this.order.phone,
+      //   cart: this.cart
+      // }
+      console.log(order);
       fetch('http://localhost:3000/collection/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(this.order),
+        body: JSON.stringify(order),
       }).then(response => {
         if (!response.ok) {
           throw new Error('Failed to place order');
@@ -150,33 +148,71 @@ export default {
       });
     },
     updateLessons() {
-      let lessonObjectID;
+      let lessonObjectIDs = [];
+
       for (let lesson of Object.keys(this.cart)) {
-        console.log(this.cart[lesson]);
         for (let product of this.products) {
-          // console.log(this.products[product].id +""+   this.cart[lesson]);
           if (this.cart[lesson] === product.id) {
-            lessonObjectID = product._id;
-            console.log(product.id + "" + this.cart[lesson]);
-            console.log(lessonObjectID);
+            lessonObjectIDs.push(product._id);
           }
         }
-        fetch('http://localhost:3000/collection/lessons/' + lessonObjectID, {
+      }
+
+      const updateRequests = lessonObjectIDs.map(lessonObjectID => {
+        return fetch('http://localhost:3000/collection/lessons/' + lessonObjectID, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
           }
         }).then(response => {
-          console.log(response);
           if (!response.ok) {
             throw new Error('Failed to update inventory');
           }
           return response.json();
         }).catch(error => {
           console.error('Error updating inventory', error);
+        });
+      });
+
+      // Wait for all requests to complete before proceeding
+      Promise.all(updateRequests)
+        .then(() => {
+          console.log('All lessons updated successfully');
+          // Any other actions you want to take after all updates are done
+        })
+        .catch(error => {
+          console.error('Error updating lessons:', error);
           // Handle error (e.g., show error message to user)
         });
-      }
+
+
+      // let lessonObjectID;
+      // for (let lesson of Object.keys(this.cart)) {
+      //   console.log(this.cart[lesson]);
+      //   for (let product of this.products) {
+      //     // console.log(this.products[product].id +""+   this.cart[lesson]);
+      //     if (this.cart[lesson] === product.id) {
+      //       lessonObjectID = product._id;
+      //       console.log(product.id + "" + this.cart[lesson]);
+      //       console.log(lessonObjectID);
+      //     }
+      //   }
+      //   fetch('http://localhost:3000/collection/lessons/' + lessonObjectID, {
+      //     method: 'PUT',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //     }
+      //   }).then(response => {
+      //     console.log(response);
+      //     if (!response.ok) {
+      //       throw new Error('Failed to update inventory');
+      //     }
+      //     return response.json();
+      //   }).catch(error => {
+      //     console.error('Error updating inventory', error);
+      //     // Handle error (e.g., show error message to user)
+      //   });
+      // }
     },
     searchResults() {
       fetch('http://localhost:3000/collection/lessons/search?q=' + this.searchInput, {
@@ -241,22 +277,6 @@ export default {
       // Sort productsArray using the compare function and pass sortby and orderby
       return productsArray.sort((a, b) => compare(a, b, this.sortby, this.orderby));
 
-    },
-    validateInput() {
-
-      var regName = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/g;
-      var regNumber = /^[0-9]*$/g;
-
-      //console.log("name:" + regName.test(this.order.name));
-      //console.log("number:" + regNumber.test(this.order.phone) + " number:" + this.order.phone)
-
-      if (this.order.name != "" && this.order.phone != "") {
-        console.log("check1");
-        if (regName.test(this.order.name) && regNumber.test(this.order.phone)) {
-          return true;
-        }
-      }
-      return false;
     }
   }
 }
