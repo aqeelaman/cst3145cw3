@@ -40,23 +40,10 @@
       <button v-else disabled='disabled'>
         Place Order</button>
     </div>
-
-
-    <!-- <h2>Checkout</h2>
-        <h3>Added Products</h3>
-        <div v-for="(product,index) in cart" :key="product.id">
-            {{ product.id }}
-            <button @click="removeItem(index)">remove</button>
-        </div>
-        <div>
-            <strong>Name</strong>
-            <input v-model="name"/>
-            <strong>Address</strong>
-            <input v-model="address"/>
-            <button @click="submitForm">Submit</button>
-        </div>-->
   </div>
 </template>
+
+
 <script>
 export default {
   name: "Checkout-Component",
@@ -85,7 +72,6 @@ export default {
       let filteredProducts = [];
       for (let item in this.cart) {
         for (let product in this.products) {
-          //console.log(this.products[product].id +" - "+ this.cart[item]);
           if (this.products[product].id == this.cart[item]) {
             filteredProducts.push(this.products[product]);
           }
@@ -102,7 +88,6 @@ export default {
       //console.log("number:" + regNumber.test(this.order.phone) + " number:" + this.order.phone)
 
       if (this.order.name != "" && this.order.phone != "") {
-        //console.log("check1");
         if (regName.test(this.order.name) && regNumber.test(this.order.phone)) {
           return true;
         }
