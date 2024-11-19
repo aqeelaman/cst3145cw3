@@ -89,7 +89,7 @@ export default {
   },
   created: function () {
     console.log("Requesting data from server");
-    fetch('http://localhost:3000/collection/lessons')
+    fetch('https://afterschoolapp-service.onrender.com/collection/lessons')
       .then(response => response.json())
       .then(json => {
         this.products = json;
@@ -125,7 +125,7 @@ export default {
     },
     submitForm(order) {
       console.log(order);
-      fetch('http://localhost:3000/collection/orders', {
+      fetch('https://afterschoolapp-service.onrender.com/collection/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -158,7 +158,7 @@ export default {
       }
 
       const updateRequests = lessonObjectIDs.map(lessonObjectID => {
-        return fetch('http://localhost:3000/collection/lessons/' + lessonObjectID, {
+        return fetch('https://afterschoolapp-service.onrender.com/collection/lessons/' + lessonObjectID, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -183,7 +183,7 @@ export default {
         });
     },
     searchResults() {
-      fetch('http://localhost:3000/collection/lessons/search?q=' + this.searchInput, {
+      fetch('https://afterschoolapp-service.onrender.com/collection/lessons/search?q=' + this.searchInput, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
